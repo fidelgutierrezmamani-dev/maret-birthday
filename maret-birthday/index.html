@@ -962,9 +962,9 @@
   .sw.on{box-shadow:0 0 0 2px #3F5A3C, 0 0 0 4px #FFFDF8, 0 0 0 5px #3F5A3C}
   .bb-in{width:100%;border:1px solid rgba(139,94,60,.4);background:#FFFDF8;padding:8px 12px;font-family:'Caveat',cursive;font-size:21px;color:#3F5A3C;outline:none}
   .bb-actions{display:flex;justify-content:space-between;gap:8px;margin-top:18px;flex-wrap:wrap}
-  .bb-final{position:fixed;inset:0;z-index:48;display:none;place-items:center;padding:20px;background:rgba(20,28,18,.72)}
+  .bb-final{position:fixed;inset:0;z-index:48;display:none;place-items:center;padding:20px;overflow:auto;background:rgba(20,28,18,.72)}
   .bb-final.on{display:grid;animation:viewIn .6s ease both}
-  .bbf-card{background:#F6EEDD;padding:26px 22px 22px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.5);transform:rotate(-1deg);max-height:94vh;overflow:auto}
+  .bbf-card{background:#F6EEDD;padding:26px 22px 22px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.5);transform:rotate(-1deg);max-height:94vh;overflow:auto;margin:auto}
   .bbf-card h3{font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(40px,10vw,56px);color:#8B5E3C;line-height:1.1}
   .bbf-card .ex-kicker{color:#3F5A3C}
   .cake-pic{display:none;width:min(240px,64vw);margin:6px auto 14px;background:#FFFDF8;padding:10px 10px 26px;box-shadow:0 12px 26px rgba(0,0,0,.3);transform:rotate(-3deg)}
@@ -983,12 +983,16 @@
     #v-hub .hub-grid{grid-template-columns:repeat(5,1fr)!important;max-width:1040px!important;gap:22px 22px}
     .views .ex-title{font-size:clamp(46px,6vw,68px)}
   }
+  .bbf-edit{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 4px}
+  .bbf-edit span{font-family:'Caveat',cursive;font-size:18px;color:#8A9A5B}
+  .bbf-edit input{font-family:'Caveat',cursive;font-size:22px;text-align:center;width:min(300px,80vw);padding:4px 12px;border:2px dashed #C9A57A;border-radius:10px;background:#FFFDF8;color:#4A3426;outline:none}
+  .bbf-edit input:focus{border-style:solid;border-color:#8A9A5B}
   .bbf-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
   .bbf-img{display:none;margin-top:12px}
   .bbf-img.on{display:block}
   .bbf-img img{width:min(220px,60vw);display:block;margin:0 auto;box-shadow:0 8px 18px rgba(0,0,0,.25)}
   .bbf-img p{font-family:'Caveat',cursive;font-size:17px;color:#6E4A2F;margin:6px 0 0}
-  .bbf-stage .bb-stage{width:min(330px,74vw);pointer-events:none}
+  .bbf-stage .bb-stage{width:min(330px,74vw,42vh);pointer-events:none;margin:0 auto}
   .bbf-ar{font-family:'Pinyon Script',cursive;font-size:30px;color:#3F5A3C;margin:4px 0 10px}
 
 
@@ -1300,7 +1304,7 @@
         </div>
       </div>
     </div>
-    <div class="bb-final" id="bbFinal"><div class="bbf-card"><p class="ex-kicker">made by you, for you</p><h3>your bouquet ♡</h3><div class="bbf-stage" id="bbfStage"></div><p class="bbf-ar">Barakallahu fiki</p><div class="bbf-btns"><button class="chip solid" type="button" id="bbfSave">download my bouquet ↓</button><button class="chip" type="button" id="bbfClose">keep editing</button></div><div class="bbf-img" id="bbfImg"></div></div></div>
+    <div class="bb-final" id="bbFinal"><div class="bbf-card"><h3 id="bbfTitle">Happy Birthday, Maret</h3><div class="bbf-stage" id="bbfStage"></div><label class="bbf-edit"><span>✎ text on your picture</span><input id="bbfTitleIn" type="text" maxlength="40" value="Happy Birthday, Maret" aria-label="Text on your picture"></label><p class="bbf-ar">Barakallahu fiki</p><div class="bbf-btns"><button class="chip solid" type="button" id="bbfSave">download my bouquet ↓</button><button class="chip" type="button" id="bbfClose">keep editing</button></div><div class="bbf-img" id="bbfImg"></div></div></div>
     <div class="vnext"><button class="vbtn ghost" data-go="hub">back to menu</button><button class="vbtn" data-go="film">next: a final surprise →</button></div>
   </section>
   <section class="view extra" id="v-film">
@@ -1968,7 +1972,7 @@ const store = {
   get(k, d){ try { const v = localStorage.getItem("maret2-" + k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
   set(k, v){ try { localStorage.setItem("maret2-" + k, JSON.stringify(v)); } catch(e){} }
 };
-try { if (location.hash === "#reset") ["wish","love","opened","coupons","seen","secretlove","done","gate"].forEach(k => localStorage.removeItem("maret2-" + k)); } catch(e) {}
+try { if (location.hash === "#reset") ["wish","love","opened","coupons","seen","secretlove","done","gate","bqtitle"].forEach(k => localStorage.removeItem("maret2-" + k)); } catch(e) {}
 const esc = t => { const d = document.createElement("div"); d.textContent = t; return d.innerHTML; };
 /* secciones en orden: cada una se desbloquea al completar la anterior */
 const ORDER = ["cake", "love", "letters", "bouquet", "film"];
@@ -3885,6 +3889,7 @@ document.getElementById("bbClear").addEventListener("click", () => { BB.flowers 
 document.getElementById("bbDone").addEventListener("click", () => {
   if (!BB.flowers.length){ toast("Add at least one flower first ✿"); bbTab = "flowers"; renderOpts(); return; }
   const fin = document.getElementById("bbFinal"), st = document.getElementById("bbfStage"); markDone("bouquet");
+  if (fin.parentElement !== document.body) document.body.appendChild(fin);
   st.innerHTML = ""; const c = document.getElementById("bbStage").cloneNode(true); c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(n => n.removeAttribute("id")); c.querySelectorAll(".bbx").forEach(n => n.remove()); c.querySelectorAll(".sel").forEach(n => n.classList.remove("sel"));
   st.appendChild(c); fin.classList.add("on");
   const cols = ["#F3EAD8","#E8C9C0","#C9A57A","#8A9A5B","#FBF6EC","#CDBBD6"];
@@ -3903,9 +3908,16 @@ document.getElementById("bbfClose").addEventListener("click", () => { document.g
   if (BB.flowers && BB.flowers.length) open(false);
 })();
 
+/* texto editable del ramo (por defecto "Happy Birthday, Maret") */
+(function(){
+  const inp = document.getElementById("bbfTitleIn"), h = document.getElementById("bbfTitle"); if (!inp) return;
+  const saved = store.get("bqtitle", null); if (saved !== null) inp.value = saved;
+  const upd = () => { h.textContent = inp.value.trim() || "\u00a0"; store.set("bqtitle", inp.value); };
+  inp.addEventListener("input", upd); upd();
+})();
 /* descargar el ramo como imagen */
 async function bouquetPNG(){
-  const S = 3, W = 360, H = 420, PAD = 40, TOP = 70, BOT = 104;
+  const S = 3, W = 360, H = 420, PAD = 40, TOP = 92, BOT = 34;
   const cv = document.createElement("canvas"); cv.width = (W + PAD*2) * S; cv.height = (H + TOP + BOT) * S;
   const ctx = cv.getContext("2d"); ctx.scale(S, S);
   const CW = W + PAD*2, CH = H + TOP + BOT;
@@ -3929,9 +3941,8 @@ async function bouquetPNG(){
   try { await document.fonts.ready; } catch(e){}
   ctx.textAlign = "center";
   const fit = (txt, size, fam, y, max = CW - 60) => { let z = size; do { ctx.font = fam.replace("#", z + "px"); z -= 1; } while (ctx.measureText(txt).width > max && z > 10); ctx.fillText(txt, CW/2, y); };
-  ctx.fillStyle = "#3F5A3C"; ctx.font = "24px 'Caveat', cursive"; ctx.fillText("made by Maret, for Maret", CW/2, 48);
-  ctx.fillStyle = "#8B5E3C"; fit("Happy Birthday, Maret", 44, "# 'Pinyon Script', cursive", TOP + H + 48);
-  ctx.fillStyle = "#6E4A2F"; fit("Barakallahu fiki · 11 · 11 · with love, Fidel", 17, "italic # 'Cormorant Garamond', serif", TOP + H + 76);
+  const ttl = (document.getElementById("bbfTitleIn").value || "").trim();
+  if (ttl) { ctx.fillStyle = "#8B5E3C"; fit(ttl, 50, "# 'Pinyon Script', cursive", 66); }
   return cv;
 }
 document.getElementById("bbfSave").addEventListener("click", async e => {
